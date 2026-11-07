@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JEE Main 2027 — ગણિત અભ્યાસ (Mathematics Practice)</title>
+  <title>JEE Main 2027 — PCM અભ્યાસ અને મૂલ્યાંકન (Practice & PR Engine)</title>
 
-  <!-- Google Fonts: Crimson Pro (Latin Serif) & Noto Serif Gujarati (Gujarati Serif) -->
+  <!-- Google Fonts: Crimson Pro (Latin), Noto Serif Gujarati & Noto Serif Devanagari -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+Gujarati:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Noto+Serif+Gujarati:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
 
@@ -39,13 +39,22 @@
     <div class="brand-group">
       <h1 class="app-title">JEE Main 2027</h1>
       <span class="meta-divider">|</span>
+      <span id="currentSubjectBadge" class="subject-tag">ગણિત</span>
       <span id="currentSectionBadge" class="section-badge">Loading...</span>
     </div>
 
     <div class="header-controls">
+      <!-- Subject Filter Dropdown (PCM) -->
+      <div class="control-item">
+        <label for="subjectSelect" class="sr-only">વિષય પસંદ કરો (Subject)</label>
+        <select id="subjectSelect" class="serif-select" title="વિષય પ્રમાણે ફિલ્ટર કરો">
+          <option value="all">બધા વિષયો (All PCM)</option>
+        </select>
+      </div>
+
       <!-- Chapter Jump / Filter Dropdown -->
       <div class="control-item">
-        <label for="chapterSelect" class="sr-only">પ્રકરણ પસંદ કરો</label>
+        <label for="chapterSelect" class="sr-only">પ્રકરણ પસંદ કરો (Chapter)</label>
         <select id="chapterSelect" class="serif-select" title="પ્રકરણ પ્રમાણે પ્રશ્નો જુઓ">
           <option value="all">બધા પ્રકરણો (All Chapters)</option>
         </select>
@@ -65,6 +74,16 @@
       <div class="timer-box" title="કુલ સમય (Elapsed Time)">
         <span id="timerDisplay">00:00:00</span>
       </div>
+
+      <!-- Interactive AI Prompt Generator Button -->
+      <button
+        type="button"
+        id="openPromptGenBtn"
+        class="btn btn-outline btn-sm"
+        title="AI MCQ જનરેટ કરવા માટે પ્રોમ્પ્ટ બનાવો (Prompt Generator)"
+      >
+        ⚡ Prompt Maker
+      </button>
 
       <!-- Custom File Load Button -->
       <button
@@ -93,7 +112,7 @@
         id="mobilePaletteBtn"
         class="btn btn-outline btn-sm mobile-only"
       >
-        પ્રશ્ન સૂચિ (<span id="answeredCountMobile">0</span>)
+        સૂચિ (<span id="answeredCountMobile">0</span>)
       </button>
 
       <!-- Primary Action Buttons -->
@@ -202,9 +221,9 @@
         </div>
       </div>
 
-      <!-- 1 to 100 Number Grid -->
+      <!-- 1 to N Number Grid -->
       <div id="paletteGrid" class="palette-grid">
-        <!-- Buttons 1..100 populated by app.js -->
+        <!-- Buttons populated by app.js -->
       </div>
 
       <div class="palette-footer">
@@ -221,7 +240,7 @@
       <div class="scorecard-header">
         <div>
           <h2 class="scorecard-title">JEE Main 2027 — પરિણામ અને વિશ્લેષણ (Scorecard)</h2>
-          <p class="scorecard-subtitle">NTA માર્કિંગ સ્કીમ (+4, −1) અને JEE Main ગણિતના PR વિશ્લેષણ આધારિત</p>
+          <p class="scorecard-subtitle">NTA માર્કિંગ સ્કીમ (+4, −1) અને વિષય મુજબ PR વિશ્લેષણ આધારિત</p>
         </div>
         <div class="scorecard-actions">
           <button type="button" id="reviewQuestionsBtn" class="btn btn-primary">
@@ -238,11 +257,11 @@
         <div class="metric-card highlight-card">
           <span class="metric-label">કુલ ગુણ (Total Marks)</span>
           <div class="metric-value" id="resTotalMarks">0 / 400</div>
-          <span class="metric-sub" id="resNormalizedMarks">100 માંથી સમતુલ્ય: 0.0</span>
+          <span class="metric-sub" id="resNormalizedMarks">300 માંથી સમતુલ્ય: 0.0</span>
         </div>
 
         <div class="metric-card highlight-card">
-          <span class="metric-label">અંદાજિત પર્સેન્ટાઇલ (Estimated PR)</span>
+          <span class="metric-label">અંદાજિત પર્સેન્ટાઇલ (Overall PR)</span>
           <div class="metric-value" id="resPercentile">0.00 PR</div>
           <span class="metric-sub" id="resPrRemark">વિશ્લેષણ...</span>
         </div>
@@ -279,6 +298,30 @@
         </div>
       </div>
 
+      <!-- Subject-Wise Performance Table (Physics / Chemistry / Maths) -->
+      <div class="chapter-analysis-block" style="margin-bottom: 2rem;">
+        <h3 class="block-heading">વિષય મુજબ વિશ્લેષણ (Subject-Wise PR & Marks)</h3>
+        <div class="table-responsive">
+          <table class="analysis-table">
+            <thead>
+              <tr>
+                <th>વિષય (Subject)</th>
+                <th>કુલ પ્રશ્નો</th>
+                <th>અટેમ્પ્ટ</th>
+                <th>સાચા (+4)</th>
+                <th>ખોટા (−1)</th>
+                <th>ચોકસાઈ</th>
+                <th>ગુણ (Marks)</th>
+                <th>અંદાજિત PR</th>
+              </tr>
+            </thead>
+            <tbody id="subjectAnalysisBody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Chapter-wise Performance Table -->
       <div class="chapter-analysis-block">
         <h3 class="block-heading">પ્રકરણ મુજબ વિશ્લેષણ (Chapter-Wise Performance)</h3>
@@ -286,6 +329,7 @@
           <table class="analysis-table">
             <thead>
               <tr>
+                <th>વિષય</th>
                 <th>પ્રકરણ (Chapter)</th>
                 <th>કુલ</th>
                 <th>અટેમ્પ્ટ</th>
@@ -304,16 +348,130 @@
     </div>
   </section>
 
+  <!-- ================= INTERACTIVE AI PROMPT GENERATOR MODAL ================= -->
+  <div id="promptGenModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="promptModalTitle">
+    <div class="modal-box modal-xl">
+      <div class="modal-header">
+        <div>
+          <h2 id="promptModalTitle" class="modal-title">⚡ JEE Main 2027 — AI MCQ Prompt Generator</h2>
+          <p class="modal-sub">Physics, Chemistry અને Maths ના પ્રકરણો પસંદ કરીને Google AI Studio / Gemini માટે તૈયાર પ્રોમ્પ્ટ બનાવો</p>
+        </div>
+        <button type="button" id="closePromptModalBtn" class="btn-close" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body prompt-builder-body">
+        <!-- Top Controls Grid: Language, Subjects, Class Filter, Question Count -->
+        <div class="prompt-config-grid">
+          <!-- 1. Language Selector -->
+          <div class="config-card">
+            <span class="config-label">1. ભાષા પસંદ કરો (Language)</span>
+            <div class="pill-group" id="pgLangGroup">
+              <button type="button" class="pill-btn active" data-lang="gu">ગુજરાતી (Gujarati)</button>
+              <button type="button" class="pill-btn" data-lang="hi">हिन्दी (Hindi)</button>
+              <button type="button" class="pill-btn" data-lang="en">English</button>
+            </div>
+          </div>
+
+          <!-- 2. Subject Multi-Select -->
+          <div class="config-card">
+            <span class="config-label">2. વિષયો પસંદ કરો (1, 2 અથવા બધા)</span>
+            <div class="pill-group" id="pgSubjectGroup">
+              <button type="button" class="pill-btn" data-subject="physics">ભૌતિક વિજ્ઞાન (Physics)</button>
+              <button type="button" class="pill-btn" data-subject="chemistry">રસાયણ વિજ્ઞાન (Chemistry)</button>
+              <button type="button" class="pill-btn active" data-subject="maths">ગણિત (Maths)</button>
+            </div>
+          </div>
+
+          <!-- 3. Class Filter -->
+          <div class="config-card">
+            <span class="config-label">3. ધોરણ પસંદ કરો (Class / Standard)</span>
+            <div class="pill-group" id="pgClassGroup">
+              <button type="button" class="pill-btn" data-class="11">ધોરણ 11 (Class 11)</button>
+              <button type="button" class="pill-btn" data-class="12">ધોરણ 12 (Class 12)</button>
+              <button type="button" class="pill-btn active" data-class="both">બંને (Class 11 & 12)</button>
+            </div>
+          </div>
+
+          <!-- 4. Question Count Input (10 to 200) -->
+          <div class="config-card">
+            <label for="pgQuestionCount" class="config-label">4. કુલ પ્રશ્નોની સંખ્યા (Min: 10, Max: 200)</label>
+            <div class="q-count-row">
+              <input
+                type="number"
+                id="pgQuestionCount"
+                class="serif-input"
+                min="10"
+                max="200"
+                step="5"
+                value="50"
+              />
+              <div class="preset-pills">
+                <button type="button" class="preset-btn" data-count="25">25</button>
+                <button type="button" class="preset-btn" data-count="50">50</button>
+                <button type="button" class="preset-btn" data-count="75">75</button>
+                <button type="button" class="preset-btn" data-count="100">100</button>
+                <button type="button" class="preset-btn" data-count="150">150</button>
+                <button type="button" class="preset-btn" data-count="200">200</button>
+              </div>
+            </div>
+            <span id="pgDistributionHint" class="config-hint">પસંદ કરેલા પ્રકરણો: 0</span>
+          </div>
+        </div>
+
+        <!-- 5. Interactive Chapter Selection Area -->
+        <div class="chapters-selection-section">
+          <div class="chapters-bar">
+            <span class="config-label">5. પ્રકરણો પસંદ કરો (Select Chapters — Official JEE Main Syllabus)</span>
+            <div class="bulk-actions">
+              <button type="button" id="pgSelectAllChaptersBtn" class="btn btn-outline btn-sm">બધા પસંદ કરો (Select All Visible)</button>
+              <button type="button" id="pgClearAllChaptersBtn" class="btn btn-outline btn-sm">બધા કાઢી નાખો (Clear All)</button>
+            </div>
+          </div>
+
+          <!-- Dynamically populated Subject & Class Chapter Grids -->
+          <div id="pgChaptersContainer" class="chapters-container">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+
+        <!-- 6. Generated Prompt Output Area -->
+        <div id="pgOutputSection" class="prompt-output-section hidden">
+          <div class="output-header">
+            <span class="config-label">6. તૈયાર થયેલો AI પ્રોમ્પ્ટ (Generated Prompt):</span>
+            <div class="output-actions">
+              <button type="button" id="pgCopyPromptBtn" class="btn btn-primary btn-sm">
+                📋 પ્રોમ્પ્ટ કોપી કરો (Copy Prompt)
+              </button>
+              <button type="button" id="pgSwitchToPasteBtn" class="btn btn-outline btn-sm">
+                📥 AI જવાબ અહીં પેસ્ટ કરો (Paste AI Response)
+              </button>
+            </div>
+          </div>
+          <textarea id="pgPromptOutput" class="prompt-textarea" rows="8" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer prompt-modal-footer">
+        <span id="pgStatusText" class="footer-status">પ્રકરણો પસંદ કરીને "Generate Prompt" દબાવો.</span>
+        <div class="footer-btns">
+          <button type="button" id="pgGenerateBtn" class="btn btn-primary">
+            ⚡ પ્રોમ્પ્ટ બનાવો (Generate Prompt)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= MARKDOWN FILE LOADER MODAL ================= -->
   <div id="loaderModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-box">
       <div class="modal-header">
-        <h2 id="modalTitle" class="modal-title">questions.md લોડ કરો</h2>
+        <h2 id="modalTitle" class="modal-title">questions.md લોડ કરો અથવા AI જવાબ પેસ્ટ કરો</h2>
         <button type="button" id="closeModalBtn" class="btn-close" aria-label="Close">✕</button>
       </div>
       <div class="modal-body">
         <p class="modal-desc">
-          જો તમે <code>index.html</code> સીધી <code>file://</code> થી ખોલી હોય અને બ્રાઉઝર ઓટો-લોડ અટકાવે, તો અહીંથી તમારી <code>questions.md</code> ફાઇલ પસંદ કરો અથવા તેનું લખાણ નીચે પેસ્ટ કરો:
+          તમારી <code>questions.md</code> ફાઇલ અહીંથી અપલોડ કરો, અથવા Prompt Maker વડે AI (Google AI Studio / Gemini) પાસેથી જનરેટ કરેલું Markdown સીધું નીચે પેસ્ટ કરો:
         </p>
 
         <div class="file-upload-box">
@@ -324,11 +482,11 @@
         </div>
 
         <div class="paste-area-wrap">
-          <label for="mdPasteTextarea" class="paste-label">અથવા Markdown અહીં પેસ્ટ કરો:</label>
+          <label for="mdPasteTextarea" class="paste-label">અથવા AI દ્વારા જનરેટ કરેલું Markdown અહીં પેસ્ટ કરો:</label>
           <textarea
             id="mdPasteTextarea"
-            rows="7"
-            placeholder="### **વિભાગ I: ધોરણ 11 (Class 11)** ..."
+            rows="8"
+            placeholder="## **વિષય: ભૌતિક વિજ્ઞાન (Physics)**&#10;### **વિભાગ I: ધોરણ 11 (Class 11)** ..."
           ></textarea>
         </div>
       </div>
