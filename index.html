@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="gu" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JEE Main 2027 — ગણિત અભ્યાસ (Mathematics Practice)</title>
+
+  <!-- Google Fonts: Crimson Pro (Latin Serif) & Noto Serif Gujarati (Gujarati Serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+Gujarati:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- KaTeX CDN for LaTeX Math Rendering -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    crossorigin="anonymous"
+  />
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ================= TOP HEADER BAR ================= -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <h1 class="app-title">JEE Main 2027</h1>
+      <span class="meta-divider">|</span>
+      <span id="currentSectionBadge" class="section-badge">Loading...</span>
+    </div>
+
+    <div class="header-controls">
+      <!-- Chapter Jump / Filter Dropdown -->
+      <div class="control-item">
+        <label for="chapterSelect" class="sr-only">પ્રકરણ પસંદ કરો</label>
+        <select id="chapterSelect" class="serif-select" title="પ્રકરણ પ્રમાણે પ્રશ્નો જુઓ">
+          <option value="all">બધા પ્રકરણો (All Chapters)</option>
+        </select>
+      </div>
+
+      <!-- Review Mode Filter (Visible only after Final Submit) -->
+      <div id="reviewFilterWrap" class="control-item hidden">
+        <select id="reviewFilterSelect" class="serif-select" title="પરિણામ ફિલ્ટર">
+          <option value="all">બધા પ્રશ્નો (All)</option>
+          <option value="incorrect">ખોટા પડેલા (Incorrect)</option>
+          <option value="unattempted">બાકી રાખેલા (Unattempted)</option>
+          <option value="correct">સાચા પડેલા (Correct)</option>
+        </select>
+      </div>
+
+      <!-- Persistent Exam Timer -->
+      <div class="timer-box" title="કુલ સમય (Elapsed Time)">
+        <span id="timerDisplay">00:00:00</span>
+      </div>
+
+      <!-- Custom File Load Button -->
+      <button
+        type="button"
+        id="openLoaderBtn"
+        class="btn btn-outline btn-sm"
+        title="questions.md ફાઇલ અપલોડ કરો અથવા પેસ્ટ કરો"
+      >
+        📄 ફાઇલ
+      </button>
+
+      <!-- Light / Dark Paper Theme Toggle -->
+      <button
+        type="button"
+        id="themeToggleBtn"
+        class="btn btn-outline btn-sm"
+        title="થીમ બદલો (Light / Dark)"
+        aria-label="Toggle Theme"
+      >
+        ☽
+      </button>
+
+      <!-- Mobile Question Palette Drawer Toggle -->
+      <button
+        type="button"
+        id="mobilePaletteBtn"
+        class="btn btn-outline btn-sm mobile-only"
+      >
+        પ્રશ્ન સૂચિ (<span id="answeredCountMobile">0</span>)
+      </button>
+
+      <!-- Primary Action Buttons -->
+      <button type="button" id="submitExamBtn" class="btn btn-primary btn-sm">
+        Final Submit
+      </button>
+      <button type="button" id="viewScorecardBtn" class="btn btn-primary btn-sm hidden">
+        પરિણામ પત્રક (Scorecard)
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN EXAM WORKSPACE ================= -->
+  <main id="examWorkspace" class="workspace">
+    <!-- Left / Center Column: Single Question Area -->
+    <section class="question-stage" aria-live="polite">
+      <!-- Question Metadata Header -->
+      <div class="question-meta-bar">
+        <div class="q-meta-left">
+          <span id="questionNumberLabel" class="q-num-badge">પ્રશ્ન 1 / 100</span>
+          <span id="chapterTitleLabel" class="q-chapter-label">પ્રકરણ...</span>
+        </div>
+        <div class="q-meta-right">
+          <span id="reviewStatusBadge" class="status-pill hidden"></span>
+          <span class="marking-scheme" title="સાચા જવાબ માટે +4, ખોટા માટે -1">+4, −1</span>
+        </div>
+      </div>
+
+      <!-- Question Content Card -->
+      <article class="question-card">
+        <div id="questionText" class="question-statement">
+          પ્રશ્નપત્ર લોડ થઈ રહ્યું છે...
+        </div>
+
+        <!-- 4 Options List -->
+        <div id="optionsContainer" class="options-list" role="radiogroup" aria-label="વિકલ્પો">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+        <!-- Post-Submission Answer Key Verification Banner -->
+        <div id="answerVerificationBox" class="verification-box hidden">
+          <!-- Populated after Final Submit -->
+        </div>
+      </article>
+
+      <!-- Bottom Navigation & Action Bar -->
+      <footer class="question-nav-bar">
+        <div class="nav-left">
+          <button type="button" id="prevQuestionBtn" class="btn btn-secondary">
+            ← પાછળ (Previous)
+          </button>
+        </div>
+
+        <div class="nav-center">
+          <button type="button" id="markReviewBtn" class="btn btn-outline">
+            પુનઃસમીક્ષા (Mark for Review)
+          </button>
+          <button type="button" id="clearResponseBtn" class="btn btn-outline">
+            જવાબ ભૂંસો (Clear)
+          </button>
+        </div>
+
+        <div class="nav-right">
+          <button type="button" id="nextQuestionBtn" class="btn btn-primary">
+            આગળ (Next) →
+          </button>
+        </div>
+      </footer>
+
+      <div class="keyboard-hint">
+        <span>કીબોર્ડ શોર્ટકટ: <strong>A / B / C / D</strong> અથવા <strong>1–4</strong> વિકલ્પ પસંદ કરવા • <strong>← / →</strong> પાછળ/આગળ જવા • <strong>R</strong> પુનઃસમીક્ષા માટે</span>
+      </div>
+    </section>
+
+    <!-- Right Sidebar / Mobile Drawer: Question Palette -->
+    <aside id="paletteSidebar" class="palette-sidebar" aria-label="પ્રશ્ન પેલેટ">
+      <div class="palette-header">
+        <h2 class="palette-title">પ્રશ્ન પેલેટ (Question Palette)</h2>
+        <button
+          type="button"
+          id="closePaletteBtn"
+          class="btn-close mobile-only"
+          aria-label="Close Palette"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Live Status Summary Legend -->
+      <div class="palette-legend">
+        <div class="legend-item">
+          <span class="dot dot-answered"></span>
+          <span>જવાબ આપેલ: <strong id="statAnswered">0</strong></span>
+        </div>
+        <div class="legend-item">
+          <span class="dot dot-review"></span>
+          <span>પુનઃસમીક્ષા: <strong id="statReview">0</strong></span>
+        </div>
+        <div class="legend-item">
+          <span class="dot dot-unanswered"></span>
+          <span>છોડેલા: <strong id="statUnanswered">0</strong></span>
+        </div>
+        <div class="legend-item">
+          <span class="dot dot-unvisited"></span>
+          <span>બાકી: <strong id="statUnvisited">0</strong></span>
+        </div>
+      </div>
+
+      <!-- 1 to 100 Number Grid -->
+      <div id="paletteGrid" class="palette-grid">
+        <!-- Buttons 1..100 populated by app.js -->
+      </div>
+
+      <div class="palette-footer">
+        <button type="button" id="resetProgressBtn" class="btn btn-danger-outline btn-block">
+          પ્રોગ્રેસ રીસેટ કરો (Reset Progress)
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ================= FINAL SCORECARD & PR VIEW ================= -->
+  <section id="scorecardView" class="scorecard-view hidden" aria-label="પરીક્ષા પરિણામ">
+    <div class="scorecard-container">
+      <div class="scorecard-header">
+        <div>
+          <h2 class="scorecard-title">JEE Main 2027 — પરિણામ અને વિશ્લેષણ (Scorecard)</h2>
+          <p class="scorecard-subtitle">NTA માર્કિંગ સ્કીમ (+4, −1) અને JEE Main ગણિતના PR વિશ્લેષણ આધારિત</p>
+        </div>
+        <div class="scorecard-actions">
+          <button type="button" id="reviewQuestionsBtn" class="btn btn-primary">
+            પ્રશ્નો અને સાચા જવાબો તપાસો (Review Solutions)
+          </button>
+          <button type="button" id="retakeExamBtn" class="btn btn-outline">
+            ફરીથી પરીક્ષા આપો (Retake Test)
+          </button>
+        </div>
+      </div>
+
+      <!-- Top Summary Metric Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card highlight-card">
+          <span class="metric-label">કુલ ગુણ (Total Marks)</span>
+          <div class="metric-value" id="resTotalMarks">0 / 400</div>
+          <span class="metric-sub" id="resNormalizedMarks">100 માંથી સમતુલ્ય: 0.0</span>
+        </div>
+
+        <div class="metric-card highlight-card">
+          <span class="metric-label">અંદાજિત પર્સેન્ટાઇલ (Estimated PR)</span>
+          <div class="metric-value" id="resPercentile">0.00 PR</div>
+          <span class="metric-sub" id="resPrRemark">વિશ્લેષણ...</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-label">ચોકસાઈ (Accuracy)</span>
+          <div class="metric-value" id="resAccuracy">0%</div>
+          <span class="metric-sub" id="resAttemptRatio">0 / 100 પ્રશ્નો અટેમ્પ્ટ કર્યા</span>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-label">સમય (Time Taken)</span>
+          <div class="metric-value" id="resTimeTaken">00:00:00</div>
+          <span class="metric-sub" id="resAvgTime">પ્રતિ પ્રશ્ન સરેરાશ: 0 સેકન્ડ</span>
+        </div>
+      </div>
+
+      <!-- Detailed Counts Strip -->
+      <div class="breakdown-strip">
+        <div class="strip-item strip-correct">
+          <span>સાચા જવાબ (Correct):</span>
+          <strong id="resCorrectCount">0</strong>
+          <small id="resPositiveMarks">(+0)</small>
+        </div>
+        <div class="strip-item strip-wrong">
+          <span>ખોટા જવાબ (Incorrect):</span>
+          <strong id="resWrongCount">0</strong>
+          <small id="resNegativeMarks">(−0)</small>
+        </div>
+        <div class="strip-item strip-skipped">
+          <span>છોડી દીધેલા (Unattempted):</span>
+          <strong id="resSkippedCount">0</strong>
+          <small>(0)</small>
+        </div>
+      </div>
+
+      <!-- Chapter-wise Performance Table -->
+      <div class="chapter-analysis-block">
+        <h3 class="block-heading">પ્રકરણ મુજબ વિશ્લેષણ (Chapter-Wise Performance)</h3>
+        <div class="table-responsive">
+          <table class="analysis-table">
+            <thead>
+              <tr>
+                <th>પ્રકરણ (Chapter)</th>
+                <th>કુલ</th>
+                <th>અટેમ્પ્ટ</th>
+                <th>સાચા (+4)</th>
+                <th>ખોટા (−1)</th>
+                <th>ચોકસાઈ</th>
+                <th>ગુણ (Marks)</th>
+              </tr>
+            </thead>
+            <tbody id="chapterAnalysisBody">
+              <!-- Populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MARKDOWN FILE LOADER MODAL ================= -->
+  <div id="loaderModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">questions.md લોડ કરો</h2>
+        <button type="button" id="closeModalBtn" class="btn-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          જો તમે <code>index.html</code> સીધી <code>file://</code> થી ખોલી હોય અને બ્રાઉઝર ઓટો-લોડ અટકાવે, તો અહીંથી તમારી <code>questions.md</code> ફાઇલ પસંદ કરો અથવા તેનું લખાણ નીચે પેસ્ટ કરો:
+        </p>
+
+        <div class="file-upload-box">
+          <label for="mdFileInput" class="file-label">
+            📁 <strong>questions.md ફાઇલ પસંદ કરો (Choose File)</strong>
+          </label>
+          <input type="file" id="mdFileInput" accept=".md,.txt" />
+        </div>
+
+        <div class="paste-area-wrap">
+          <label for="mdPasteTextarea" class="paste-label">અથવા Markdown અહીં પેસ્ટ કરો:</label>
+          <textarea
+            id="mdPasteTextarea"
+            rows="7"
+            placeholder="### **વિભાગ I: ધોરણ 11 (Class 11)** ..."
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="loadPastedMdBtn" class="btn btn-primary">
+          પ્રશ્નપત્ર લોડ કરો (Load Questions)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
